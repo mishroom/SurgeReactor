@@ -1,0 +1,21 @@
+{
+  "name": "surgereactor",
+  "version": "1.0.0",
+  "description": " ",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mishroom/SurgeReactor.git"
+  },
+  "author": "mishroom",
+  "license": "ISC",
+  "homepage": "https://github.com/mishroom/SurgeReactor",
+  "dependencies": {
+    "express": "^4.16.2",
+    "nodemon": "^1.14.11",
+    "redis": "^2.8.0"
+  }
+}
