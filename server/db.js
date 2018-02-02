@@ -22,6 +22,23 @@ const surgeSchema = new mongoose.Schema({
 const Supply_Demand = mongoose.model('Supply_Demand', supply_demandSchema);
 const Surge = mongoose.model('Surge', surgeSchema);
 
+
+const convertTimeToNearest15Minutes = (time, minutes) => {
+  let newMins = null;
+  if (minutes > 45) {
+    newMins = '45';
+  } else if (minutes > 30) {
+    newMins = '30';
+  } else if (minutes > 15) {
+    newMins = '15';
+  } else if (minutes > 0) {
+    newMins = '00';
+  }
+  time.setMinutes(newMins);
+  return time;
+};
+
+
 module.exports = {
   generateData: () => {
     const t = process.hrtime();
@@ -88,7 +105,19 @@ module.exports = {
       data.push(makeData());
     }
     saveDataArray();
+  },
 
-    // console.log('saved 1M db entries in this time: ', process.hrtime(t), data.length);
+
+
+  getEstimate: (data, cb) => {
+    let query = new Date (data.time_stamp);
+    query.setSeconds(0);
+    const minutes = query.getMinutes();
+
+    if (minutes !== '00' && minutes !== '15' && minutes !== '30' && minutes !== '45') {
+      query = convertTimeToNearest15Minutes(query, minutes);
+    }
+    // Surge.find({ time_stamp: timeQuery }, cb);
+
   }
 };

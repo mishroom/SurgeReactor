@@ -23,6 +23,19 @@ module.exports = {
   },
 
   getEstimate: (req, res) => {
+    const t = process.hrtime();
+    req.on('data', (chunk) => {
+      const data = JSON.parse(chunk.toString());
+      db.getEstimate (data, (err, resp) => {
+        if (err) {
+          console.log(err);
+          res.end();
+        } else {
+          console.log(process.hrtime(t));
+          res.json(resp);
+        }
+      });
+    });
     res.end();
   },
 

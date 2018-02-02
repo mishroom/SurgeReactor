@@ -6,7 +6,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.get('/price', handler.getEstimate);
+app.post('/price', handler.getEstimate);
 
 app.post('/match/:qname', handler.addToQueue);
 
