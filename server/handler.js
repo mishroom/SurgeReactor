@@ -23,22 +23,32 @@ module.exports = {
   },
 
   getEstimate: (req, res) => {
-
-    req.on('data', (chunk) => {
+    const t = process.hrtime();
+    req.on('data', chunk => {
       const data = JSON.parse(chunk.toString());
-      const t = process.hrtime();
-      db.getEstimate (data, (err, resp) => {
+      db.getEstimate((err, ratio) => {
         if (err) {
           console.log(err);
-          res.end();
         } else {
-          const diff = process.hrtime(t);
-          console.log('Database Query ran in ' + diff[0] + ' second(s) and ' + diff[1] + ' nanoseconds');
-          res.json(resp);
+          const is_surged = ratio > 1 ? true : false;
+          const response = {
+            'rider_id': data.rider_id,
+            'surge_id': 0,
+            'is_surged': is_surged,
+            'surge_ratio': ratio,
+          };
+          console.log(process.hrtime(t));
+          res.json(response);
         }
       });
+      
     });
-    // res.end();
+
+
+
+    
+
+    
   },
 
   deleteQueue: (req, res) => {
@@ -66,10 +76,8 @@ module.exports = {
   },
 
   generateData: (req, res) => {
-    // for (var i = 0; i < 10; i++) {
-      console.log('Adding data: ' + /*(i + 1) */ 1000000 + ' entries');
-      db.generateData();
-    // }
+    console.log('Adding data: ' + 1000000 + ' entries');
+    db.generateData();
     res.end();
   }
 };

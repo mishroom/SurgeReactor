@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/surge');
 const db = mongoose.connection;
+
+const schedule = require('node-schedule');
+
 db.once('open', () => {
   console.log('mongoose connected successfully');
 });
@@ -19,7 +22,6 @@ const supply_demandSchema = mongoose.Schema({
 });
 
 const surgeSchema = new mongoose.Schema({
-  time_stamp: String, //every 15 mins
   is_surged: Boolean,
   surge_ratio: Number, 
 });
@@ -27,6 +29,8 @@ const surgeSchema = new mongoose.Schema({
 
 const Supply_Demand = mongoose.model('Supply_Demand', supply_demandSchema);
 const Surge = mongoose.model('Surge', surgeSchema);
+
+let ratio = null;
 
 
 const convertTimeToNearest15Minutes = (time, minutes) => {
@@ -44,6 +48,66 @@ const convertTimeToNearest15Minutes = (time, minutes) => {
   return time;
 };
 
+const determineSurge = (demand, supply) => {
+  ratio = demand / supply;
+  console.log('IN determineSurge, RATIO: ', ratio);
+
+};
+
+const getAverage = (data) => {
+  console.log('length of data array', data.length);
+
+  // average out the  rider and driver counts counts
+  if (data.length) {
+    let riderDemandSum = 0;
+    let driverSupplySum = 0;
+    data.forEach( object => {
+      riderDemandSum += object.rider;
+      driverSupplySum += object.driver;
+    });
+
+    const riderDemandAvg = Math.floor(riderDemandSum / data.length);
+    const driverSupplyAvg = Math.floor(driverSupplySum / data.length);
+    determineSurge(riderDemandAvg, driverSupplyAvg);
+  }
+};
+
+const collectData = (fireDate) => {
+  console.log('In Collect Data', fireDate);
+  const year = fireDate.getFullYear();
+  const month = fireDate.getMonth() + 1;
+  const day = fireDate.getDate();
+  const hour = fireDate.getUTCHours();
+  const minute = fireDate.getMinutes();
+  const seconds = fireDate.getSeconds();
+
+  // determine max
+  let max = 30;
+ 
+  if (minute === 0) {
+    max = 15;
+  } else if (minute === 15) {
+    max = 30;
+  } else if (minute === 30) {
+    max = 45;
+  } else if (minute === 45) {
+    max = 59;
+  }
+
+  Supply_Demand.find({year: year, month: month, day: day, hour: hour, minute: { $gt: minute, $lt: max}}, (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      getAverage(data);
+    }
+  });
+};
+
+const zero = schedule.scheduleJob('00 * * * *', collectData);
+const fifteen = schedule.scheduleJob('15 * * * *', collectData);
+const thirty = schedule.scheduleJob('30 * * * *', collectData);
+const fortyfive = schedule.scheduleJob('45 * * * *', collectData);
+const now = schedule.scheduleJob('21 * * * *', collectData);
 
 module.exports = {
   generateData: () => {
@@ -87,20 +151,21 @@ module.exports = {
 
       const year = 2018;
 
-      const time = hour + ':' + minute + ':' + getRandomInt(0, 4) * 15;
-      const timeStamp = year + '-' + validateDoubleDigits(month) + '-' + day + 'T' + time + '.511Z';
+      const time = hour + ':' + minute + ':' + validateDoubleDigits(getRandomInt(0, 4) * 15);
+      const timeStamp = year + '-' + validateDoubleDigits(month) + '-' + day + 'T' + time;
       return timeStamp;
     };
 
     const makeData = () => {
-
-      const time = new Date (getRandomTime());
+      const random = getRandomTime();
+      const time = new Date (random);
+      // console.log(random);
       return ({
         time_stamp: time,
-        year: time.getYear(),
-        month: time.getMonth(),
-        day: time.getDay(),
-        hour: time.getHour(),
+        year: time.getFullYear(),
+        month: time.getMonth() + 1,
+        day: time.getDate(),
+        hour: time.getUTCHours(),
         minute: time.getMinutes(),
         seconds: time.getSeconds(),
         rider: getRandomInt(0, 3000),
@@ -123,20 +188,10 @@ module.exports = {
       data.push(makeData());
     }
     saveDataArray();
+    // console.log(data);
   },
 
-
-
-  getEstimate: (data, cb) => {
-    let query = data.time_stamp;
-    // query.setSeconds(0);
-    // const minutes = query.getMinutes();
-
-    // if (minutes !== '00' && minutes !== '15' && minutes !== '30' && minutes !== '45') {
-    //   query = convertTimeToNearest15Minutes(query, minutes);
-    // }
-    
-    Supply_Demand.find({ time_stamp: query }, cb);
-
+  getEstimate: (cb) => {
+    cb(null, ratio);
   }
 };
