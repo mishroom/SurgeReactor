@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/lit');
+mongoose.connect('mongodb://localhost/surge');
 const db = mongoose.connection;
 db.once('open', () => {
   console.log('mongoose connected successfully');
@@ -8,6 +8,12 @@ db.once('open', () => {
 
 const supply_demandSchema = mongoose.Schema({
   time_stamp: String,
+  year: Number,
+  month: Number,
+  day: Number,
+  hour: Number,
+  minute: Number,
+  seconds: Number,
   rider: Number,
   driver: Number, 
 });
@@ -66,9 +72,11 @@ module.exports = {
         11: 30,
         12: 31
       };
+
       const validateDoubleDigits = (num) => {
         return num < 10 ? '0' + num : num;
       };
+
       const month = Math.floor(Math.random() * 12) + 1;
 
       const hour = validateDoubleDigits(getRandomInt(0, 24));
@@ -77,18 +85,28 @@ module.exports = {
 
       const day = validateDoubleDigits(getRandomInt(1, monthDays[month] + 1));
 
+      const year = 2018;
+
       const time = hour + ':' + minute + ':' + getRandomInt(0, 4) * 15;
-      const timeStamp = '2018-' + validateDoubleDigits(month) + '-' + day + 'T' + time + '.511Z';
+      const timeStamp = year + '-' + validateDoubleDigits(month) + '-' + day + 'T' + time + '.511Z';
       return timeStamp;
     };
 
-    const makeData = () => (
-      {
-        time_stamp: getRandomTime(),
+    const makeData = () => {
+
+      const time = new Date (getRandomTime());
+      return ({
+        time_stamp: time,
+        year: time.getYear(),
+        month: time.getMonth(),
+        day: time.getDay(),
+        hour: time.getHour(),
+        minute: time.getMinutes(),
+        seconds: time.getSeconds(),
         rider: getRandomInt(0, 3000),
         driver: getRandomInt(0, 3000),
-      }
-    );
+      });
+    };
 
     const saveDataArray = () => {
       // console.log(data.length);
@@ -110,14 +128,15 @@ module.exports = {
 
 
   getEstimate: (data, cb) => {
-    let query = new Date (data.time_stamp);
-    query.setSeconds(0);
-    const minutes = query.getMinutes();
+    let query = data.time_stamp;
+    // query.setSeconds(0);
+    // const minutes = query.getMinutes();
 
-    if (minutes !== '00' && minutes !== '15' && minutes !== '30' && minutes !== '45') {
-      query = convertTimeToNearest15Minutes(query, minutes);
-    }
-    // Surge.find({ time_stamp: timeQuery }, cb);
+    // if (minutes !== '00' && minutes !== '15' && minutes !== '30' && minutes !== '45') {
+    //   query = convertTimeToNearest15Minutes(query, minutes);
+    // }
+    
+    Supply_Demand.find({ time_stamp: query }, cb);
 
   }
 };

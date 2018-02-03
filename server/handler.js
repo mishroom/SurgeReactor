@@ -23,20 +23,22 @@ module.exports = {
   },
 
   getEstimate: (req, res) => {
-    const t = process.hrtime();
+
     req.on('data', (chunk) => {
       const data = JSON.parse(chunk.toString());
+      const t = process.hrtime();
       db.getEstimate (data, (err, resp) => {
         if (err) {
           console.log(err);
           res.end();
         } else {
-          console.log(process.hrtime(t));
+          const diff = process.hrtime(t);
+          console.log('Database Query ran in ' + diff[0] + ' second(s) and ' + diff[1] + ' nanoseconds');
           res.json(resp);
         }
       });
     });
-    res.end();
+    // res.end();
   },
 
   deleteQueue: (req, res) => {
