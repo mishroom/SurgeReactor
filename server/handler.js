@@ -7,8 +7,10 @@ module.exports = {
 
   addToQueue: (req, res) => {
     const { qname } = req.params;
+    console.log("in add to queue");
+    // res.end();
     req.on('data', (chunk) => {
-      rsmq.sendMessage({qname: qname, message: chunk.toString()}, (err, resp) => {
+      rsmq.sendMessage({qname: qname, message: JSON.parse(chunk.toString())}, (err, resp) => {
         if (err) {
           res.send(err);
         } else if (resp) {

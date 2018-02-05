@@ -4,6 +4,10 @@ var RSMQWorker = require( "rsmq-worker" );
 var workerRider = new RSMQWorker( "riders" );
 var workerDriver = new RSMQWorker( "drivers" );
 
+workerRider.on('message', (msg, next, id) => {
+  console.log('MesageId: ', id);
+});
+
 module.exports = {
   makeMatch: (qname) => {
     let match = {};

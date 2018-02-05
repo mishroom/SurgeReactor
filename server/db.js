@@ -5,6 +5,15 @@ const db = mongoose.connection;
 
 const schedule = require('node-schedule');
 
+var redis = require('redis');
+var client = redis.createClient();
+
+client.on('connect', () => {
+  console.log('redis connected successfully');
+});
+
+
+
 db.once('open', () => {
   console.log('mongoose connected successfully');
 });
@@ -30,8 +39,6 @@ const surgeSchema = new mongoose.Schema({
 const Supply_Demand = mongoose.model('Supply_Demand', supply_demandSchema);
 const Surge = mongoose.model('Surge', surgeSchema);
 
-let ratio = null;
-
 
 const convertTimeToNearest15Minutes = (time, minutes) => {
   let newMins = null;
@@ -49,13 +56,15 @@ const convertTimeToNearest15Minutes = (time, minutes) => {
 };
 
 const determineSurge = (demand, supply) => {
-  ratio = demand / supply;
-  console.log('IN determineSurge, RATIO: ', ratio);
+  let ratio = demand / supply;
+
+  client.set('surgeRatio', ratio, (err, resp) => {
+    console.log('setting surge ratio ', resp);
+  });
 
 };
 
 const getAverage = (data) => {
-  console.log('length of data array', data.length);
 
   // average out the  rider and driver counts counts
   if (data.length) {
@@ -82,7 +91,7 @@ const collectData = (fireDate) => {
   const seconds = fireDate.getSeconds();
 
   // determine max
-  let max = 30;
+  let max = 45;
  
   if (minute === 0) {
     max = 15;
@@ -107,7 +116,7 @@ const zero = schedule.scheduleJob('00 * * * *', collectData);
 const fifteen = schedule.scheduleJob('15 * * * *', collectData);
 const thirty = schedule.scheduleJob('30 * * * *', collectData);
 const fortyfive = schedule.scheduleJob('45 * * * *', collectData);
-const now = schedule.scheduleJob('21 * * * *', collectData);
+// const now = schedule.scheduleJob('37 * * * *', collectData);
 
 module.exports = {
   generateData: () => {
@@ -192,6 +201,9 @@ module.exports = {
   },
 
   getEstimate: (cb) => {
-    cb(null, ratio);
+    client.get('surgeRatio', (err, reply) => {
+      cb(null, reply);
+    });
+    // cb(null, ratio);
   }
 };

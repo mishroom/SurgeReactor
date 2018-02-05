@@ -1,14 +1,15 @@
 config:
-  target: 'http://localhost:3000'
+  target:  "http://localhost:3000"
   phases:
     - duration: 10
-      arrivalRate: 1
-  defaults:
-    headers:
-      x-my-service-auth: '987401838271002188298567'
+      arrivalRate: 1   
+  http:
+    timeout: 10
+
 scenarios:
   - flow:
-    - get:
-        url: "/"
-    - post: 
-        url: "/match/riders"    
+    - post:
+        url: "/price"   
+        json: 
+          test: "hi"
+   
