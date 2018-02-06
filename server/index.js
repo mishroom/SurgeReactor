@@ -18,6 +18,8 @@ app.get('/', (req, res) => { res.end(); });
 
 app.post('/generatedata', handler.generateData);
 
+app.get('/generateQueue/:quantity', handler.generateQueue);
+
 app.listen(3000, () => {
   console.log('listening on port 3000!');
 });

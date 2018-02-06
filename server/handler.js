@@ -3,6 +3,7 @@ const rsmq = new RedisSMQ( {host: '127.0.0.1', port: 6379, ns: 'rsmq'} );
 const worker = require('./worker.js');
 const db = require('./db.js');
 
+
 module.exports = {
 
   addToQueue: (req, res) => {
@@ -10,7 +11,7 @@ module.exports = {
     console.log("in add to queue");
     // res.end();
     req.on('data', (chunk) => {
-      rsmq.sendMessage({qname: qname, message: JSON.parse(chunk.toString())}, (err, resp) => {
+      rsmq.sendMessage({qname: qname, message: chunk.toString()}, (err, resp) => {
         if (err) {
           res.send(err);
         } else if (resp) {
@@ -81,5 +82,11 @@ module.exports = {
     console.log('Adding data: ' + 1000000 + ' entries');
     db.generateData();
     res.end();
+  },
+
+  generateQueue: (req, res) => {
+    const {quantity} = req.params;
+    worker.generateData(quantity);
+    res.end(quantity);
   }
 };
