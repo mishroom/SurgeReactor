@@ -12,7 +12,7 @@ module.exports = {
       if (err) {
         res.send(err);
       } else if (resp) {
-        console.log('Message sent to : ', qname, ' ', resp);
+        // console.log('Message sent to : ', qname, ' ', resp);
         res.send('You have been added to the matching pool');
       }
     });  
@@ -73,5 +73,19 @@ module.exports = {
     const {quantity} = req.params;
     worker.generateData(quantity);
     res.end(quantity);
+  },
+
+  addSurgeData: (req, res) => {
+    //req.body is the data i need to add to mongo
+    // add to mongo
+    // respond with 200
+
+//     {
+//   'time_stamp': '2018-01-25T18:25:43.511Z',
+//   'rider': 43,
+//   'driver': 21, 
+// }
+
+
   }
 };

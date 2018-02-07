@@ -21,6 +21,8 @@ app.post('/generatedata', handler.generateData);
 
 app.get('/generateQueue/:quantity', handler.generateQueue);
 
+app.post('/surge', handler.addSurgeData);
+
 app.listen(3000, () => {
   console.log('listening on port 3000!');
 });
@@ -30,7 +32,7 @@ app.listen(3000, () => {
 
 
 
-
+module.exports = app;
 
 
 

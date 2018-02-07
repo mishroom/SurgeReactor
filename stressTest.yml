@@ -9,7 +9,20 @@ config:
 scenarios:
   - flow:
     - post:
-        url: "/price"   
+        url: "/match/riders"   
         json: 
-          rider_id: 3243
+          rider: {
+            "id": 45423,
+            "username": "mishfish",
+            "start": {
+              "longitude" : 234, 
+              "latitude": 1343
+            },
+            "destination": {
+              "longitude": 1234,
+              "latitude": 1344
+            },
+            "Timestamp": 13314
+          }
+
 
