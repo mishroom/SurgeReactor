@@ -1,15 +1,15 @@
 config:
-  target:  "http://localhost:3000/"
+  target:  "http://localhost:3000"
   phases:
-    - duration: 10
-      arrivalRate: 1   
+    - duration: 5
+      arrivalRate: 1000   
   http:
-    timeout: 10
+    timeout: 60
 
 scenarios:
   - flow:
     - post:
         url: "/price"   
         json: 
-          test: "hi"
-   
+          rider_id: 3243
+

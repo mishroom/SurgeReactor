@@ -202,6 +202,9 @@ module.exports = {
 
   getEstimate: (cb) => {
     client.get('surgeRatio', (err, reply) => {
+      if (reply < 1) {
+        reply = 1;
+      }
       cb(null, reply);
     });
     // cb(null, ratio);

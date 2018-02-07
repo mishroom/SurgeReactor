@@ -1,55 +1,48 @@
 const RedisSMQ = require("rsmq");
 const rsmq = new RedisSMQ( {host: "127.0.0.1", port: 6379, ns: "rsmq"} );
 const RSMQWorker = require( "rsmq-worker" );
-const workerRider = new RSMQWorker( "riders" );
+const workerMatch = new RSMQWorker( 'matches' );
 const workerDriver = new RSMQWorker( "drivers" );
 
 workerDriver.on( "message", function( msg, next, id ) {
-  //this is where matching happens
   let match = {};
-
-
-  // check if there is a rider in the rider queue
-
-  // workerRider.on('message', (msgRider, nextRider, idRider) => {
-  //   match.request_id = idRider;
-  //   match.rider = JSON.parse(msgRider);
-  //   match.driver = JSON.parse(msg);
-  //   console.log(match);
-  //   nextRider();
-  // });
-  workerRider.on('error', function( err, msg ) {
-    console.log( "ERROR", err, msg.id );
+  rsmq.getQueueAttributes({qname: 'riders'}, (err, resp) => {
+    if (err) {
+      console.log('ERR', err);
+    } else {
+      if (resp.msgs - resp.hiddenmsgs) {
+        rsmq.receiveMessage({qname: 'riders'}, (err, resp) => {
+          if (err) {
+            console.log(err);
+          } else {
+            match.driver = JSON.parse(msg).driver;
+            match.rider = JSON.parse(resp.message).rider;
+            match.request_id = resp.id;
+            console.log('GOT MESSAGE ', match);
+            rsmq.sendMessage({qname: 'matches', message: JSON.stringify(match)}, function (err, resp) {
+              if (err) {
+                console.log(err);
+              } else if (resp) {
+                console.log('Match sent: ', resp);
+              }
+            });
+            rsmq.deleteMessage({qname: 'riders', id: resp.id}, function (err, resp) {
+              if (resp === 1) {
+                console.log('Message deleted.');
+              } else {
+                console.log('Message not found.');
+              }
+            });
+          }
+        });
+        workerDriver.del(id);
+        next();
+      } else {
+        console.log('NO RIDERS KAY');
+      }
+    }
   });
-
-
-
-  // rsmq.receiveMessage({qname: 'riders'}, function (err, resp) {
-  //   if (err) {
-  //     console.log(err);
-  //   } else if (resp.id) {
-  //     // console.log('"Message received."', resp);  
-  //   // if yes
-  //     // save the rider, save the driver;
-  //     match.request_id = resp.id;
-  //     match.rider = JSON.parse(resp.message);
-  //     match.driver = JSON.parse(msg);
-  //     console.log(match);
-
-  //     // pop the rider, pop the driver
-  //     // ideally send to another function to match so the worker can keep working
-  //     // build the matching object and send to logger
-  //     // respond to driver and rider services with their matches
-  //   } else {
-  //     console.log('"NO RIDERS KAY?"');
-  //   // if no
-  //     // do nothing; or keep polling; tbd based on how this message queue works
-  //   }
-  // });
-
-  console.log("Message id : " + id);
-  // console.log(msg);
-  next();
+  next(false);
 });
 workerDriver.on('error', function( err, msg ) {
   console.log( "ERROR", err, msg.id );
@@ -61,8 +54,25 @@ workerDriver.on('timeout', function( msg ) {
   console.log( "TIMEOUT", msg.id, msg.rc );
 });
 
-// workerDriver.start();
-// workerRider.start();
+workerMatch.on('message', function( msg, next, id ) {
+
+  console.log(msg);
+  // workerMatch.del(id);
+  next(false);
+
+});
+workerMatch.on('error', function( err, msg ) {
+  console.log( "ERROR", err, msg.id );
+});
+workerMatch.on('exceeded', function( msg ) {
+  console.log( "EXCEEDED", msg.id );
+});
+workerMatch.on('timeout', function( msg ) {
+  console.log( "TIMEOUT", msg.id, msg.rc );
+});
+
+workerDriver.start();
+workerMatch.start();
 
 const makeData = (userType) => {
   let user = {};
@@ -84,14 +94,10 @@ module.exports = {
       allUsers.riders.push(makeData('rider'));
       allUsers.drivers.push(makeData('driver'));
     }
-    // add to queue
-
     allUsers.riders.forEach(rider => {
       rsmq.sendMessage({qname: 'riders', message: rider}, (err, resp) => {
         if (err) {
           console.log(err);
-        } else {
-          console.log('Message sent. ID:', resp);
         }
       });
     });
@@ -99,15 +105,8 @@ module.exports = {
       rsmq.sendMessage({qname: 'drivers', message: driver}, (err, resp) => {
         if (err) {
           console.log(err);
-        } else {
-          console.log('Message sent. ID:', resp);
         }
       });
     });
-
-    console.log('All users: ', allUsers);
-
-    
-
   }
 };

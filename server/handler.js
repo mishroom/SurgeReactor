@@ -8,50 +8,35 @@ module.exports = {
 
   addToQueue: (req, res) => {
     const { qname } = req.params;
-    console.log("in add to queue");
-    // res.end();
-    req.on('data', (chunk) => {
-      rsmq.sendMessage({qname: qname, message: chunk.toString()}, (err, resp) => {
-        if (err) {
-          res.send(err);
-        } else if (resp) {
-          console.log('Message sent: ', resp);
-          if (qname === 'riders') {
-            // worker.callWorkerTest();
-          }
-          res.send('success');
-        }
-      });  
-    }); 
+    rsmq.sendMessage({qname: qname, message: JSON.stringify(req.body)}, (err, resp) => {
+      if (err) {
+        res.send(err);
+      } else if (resp) {
+        console.log('Message sent to : ', qname, ' ', resp);
+        res.send('You have been added to the matching pool');
+      }
+    });  
   },
 
   getEstimate: (req, res) => {
-    const t = process.hrtime();
-    req.on('data', chunk => {
-      const data = JSON.parse(chunk.toString());
-      db.getEstimate((err, ratio) => {
-        if (err) {
-          console.log(err);
-        } else {
-          const is_surged = ratio > 1 ? true : false;
-          const response = {
-            'rider_id': data.rider_id,
-            'surge_id': 0,
-            'is_surged': is_surged,
-            'surge_ratio': ratio,
-          };
-          console.log(process.hrtime(t));
-          res.json(response);
-        }
-      });
-      
+    const { rider_id } = req.body;
+    // const t = process.hrtime();
+    db.getEstimate((err, ratio) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send('Could not retrieve estimate');
+      } else {
+        const is_surged = ratio > 1 ? true : false;
+        const response = {
+          'rider_id': rider_id,
+          'surge_id': 0,
+          'is_surged': is_surged,
+          'surge_ratio': ratio,
+        };
+        // console.log(process.hrtime(t));
+        res.json(response);
+      }
     });
-
-
-
-    
-
-    
   },
 
   deleteQueue: (req, res) => {
