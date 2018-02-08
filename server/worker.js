@@ -63,11 +63,11 @@ workerMatch.on('message', function( msg, next, id ) {
   const {request_id, rider, driver} = match;
   
   // send to rider /matches
-  const rider_match = {request_id: request_id, driver: driver, rider_id: rider.id};
+  const rider_match = {request_id: request_id, driver: driver, rider_id: rider.rider_id};
 
 
   // send to driver /matchWithRider
-  const driver_match = {request_id: request_id, driver_id: driver.id, rider: rider};
+  const driver_match = {request_id: request_id, driver_id: driver.driver_id, rider: rider};
 
   // send to logger /requests
   let is_surged = true;
@@ -100,7 +100,7 @@ workerMatch.start();
 const makeData = (userType) => {
   let user = {};
   let obj = user[userType] = {};
-  obj.id = Math.floor(Math.random() * (99999));
+  obj[userType + '_id'] = Math.floor(Math.random() * (99999));
   obj.username = Math.random().toString(36).substring(7);
   obj.timestamp = new Date().toISOString();
   return JSON.stringify(user);

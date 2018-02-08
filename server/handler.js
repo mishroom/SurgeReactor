@@ -8,35 +8,48 @@ module.exports = {
 
   addToQueue: (req, res) => {
     const { qname } = req.params;
-    rsmq.sendMessage({qname: qname, message: JSON.stringify(req.body)}, (err, resp) => {
-      if (err) {
-        res.send(err);
-      } else if (resp) {
-        // console.log('Message sent to : ', qname, ' ', resp);
-        res.send('You have been added to the matching pool');
-      }
-    });  
+
+    if (qname !== 'riders' && qname !== 'drivers') {
+      res.sendStatus(404);
+      // res.end();
+    } else if ( !req.body.rider && !req.body.driver) {
+      res.sendStatus(400);
+      // res.end();
+    } else {
+      rsmq.sendMessage({qname: qname, message: JSON.stringify(req.body)}, (err, resp) => {
+        if (err) {
+          res.send(err);
+        } else if (resp) {
+          // console.log('Message sent to : ', qname, ' ', resp);
+          res.send('You have been added to the matching pool');
+        }
+      });  
+    } 
   },
 
   getEstimate: (req, res) => {
     const { rider_id } = req.body;
-    // const t = process.hrtime();
-    db.getEstimate((err, ratio) => {
-      if (err) {
-        console.log(err);
-        res.status(500).send('Could not retrieve estimate');
-      } else {
-        const is_surged = ratio > 1 ? true : false;
-        const response = {
-          'rider_id': rider_id,
-          'surge_id': 0,
-          'is_surged': is_surged,
-          'surge_ratio': ratio,
-        };
-        // console.log(process.hrtime(t));
-        res.json(response);
-      }
-    });
+
+    if (!rider_id) {
+      res.sendStatus(400);
+    } else {
+      db.getEstimate((err, ratio) => {
+        if (err) {
+          console.log(err);
+          res.status(500).send('Could not retrieve estimate');
+        } else {
+          const is_surged = ratio > 1 ? true : false;
+          const response = {
+            'rider_id': rider_id,
+            'surge_id': 0,
+            'is_surged': is_surged,
+            'surge_ratio': ratio,
+          };
+          // console.log(process.hrtime(t));
+          res.json(response);
+        }
+      });    
+    }
   },
 
   deleteQueue: (req, res) => {
@@ -53,14 +66,16 @@ module.exports = {
 
   addQueue: (req, res) => {
     const {qname} = req.params;
+
     rsmq.createQueue({qname: qname}, (err, resp) => {
       if (err) {
         console.log(err);
       } else {
         console.log(qname, ' created');
+        res.end();
       }
     });
-    res.end();
+    
   },
 
   generateData: (req, res) => {
@@ -85,7 +100,7 @@ module.exports = {
 //   'rider': 43,
 //   'driver': 21, 
 // }
-
+  res.end();
 
   }
 };
