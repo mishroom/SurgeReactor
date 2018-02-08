@@ -24,7 +24,14 @@ describe('price endpoint', () => {
     request(app)
       .post('/price')
       .send({'rider_id': 24354})
-      .expect(200, done);
+      .expect(200)
+      .end((err, res) => {
+        expect(res.body).to.have.property('rider_id');
+        expect(res.body).to.have.property('is_surged');
+        expect(res.body).to.have.property('surge_ratio');
+        expect(res.body).to.have.property('surge_id');
+        done();
+      });
   });
 });
 
