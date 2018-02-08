@@ -4,7 +4,8 @@ const request = require('supertest');
 const { expect } = chai;
 const app = require('../server/index.js');
 
-// var request = supertest.agent(app);
+const RedisSMQ = require('rsmq');
+const rsmq = new RedisSMQ( {host: "127.0.0.1", port: 6379, ns: "rsmq"} );
 
 describe('server', () => {
   it('Server should load 200', (done) => {
@@ -78,7 +79,52 @@ describe('matching endpoint', () => {
       .post('/match/riders')
       .expect(400, done);
   });
+  it('rider should not be removed from queue before matched', done => {
+    rsmq.getQueueAttributes({qname: 'riders'}, (err, resp) => {
+      expect(resp.msgs).to.equal(1);
+    });
+    done();
+  });
+  it('driver should not be removed from queue before matched', done => {
+    rsmq.getQueueAttributes({qname: 'drivers'}, (err, resp) => {
+      expect(resp.msgs).to.equal(1);
+    });
+    done();
+  });
+  it('rider and driver should be matched', (done) => {
+    rsmq.getQueueAttributes({qname: 'matches'}, (err, resp) => {
+      expect(resp.msgs).to.equal(1);
+    });
+    done();
+  });
+  it('rider should be removed from queue once matched', done => {
+    rsmq.getQueueAttributes({qname: 'riders'}, (err, resp) => {
+      expect(resp.msgs).to.equal(0);
+    });
+    done();
+  });
+  it('driver should be removed from queue once matched', done => {
+    rsmq.getQueueAttributes({qname: 'drivers'}, (err, resp) => {
+      expect(resp.msgs).to.equal(0);
+    });
+    done();
+  });
+  it('rider and driver should make multiple matches', done => {
+    request(app)
+      .get('/generateQueue/5');
+    rsmq.getQueueAttributes({qname: 'matches'}, (err, resp) => {
+      expect(resp.msgs).to.equal(5);
+    });
+    done();
+  });
+  it('should delete all matches from queue once complete', done => {
+    rsmq.getQueueAttributes({qname: 'matches'}, (err, resp) => {
+      expect(resp.msgs).to.equal(0);
+    });
+    done();
+  });
 });
+
 
 describe('supply demand endpoint', () => {
   it('should exist', (done) => {

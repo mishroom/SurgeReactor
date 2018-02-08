@@ -11,17 +11,19 @@ module.exports = {
 
     if (qname !== 'riders' && qname !== 'drivers') {
       res.sendStatus(404);
-      // res.end();
+      res.end();
     } else if ( !req.body.rider && !req.body.driver) {
       res.sendStatus(400);
-      // res.end();
+      res.end();
     } else {
       rsmq.sendMessage({qname: qname, message: JSON.stringify(req.body)}, (err, resp) => {
         if (err) {
           res.send(err);
+          res.end();
         } else if (resp) {
           // console.log('Message sent to : ', qname, ' ', resp);
           res.send('You have been added to the matching pool');
+          res.end();
         }
       });  
     } 
