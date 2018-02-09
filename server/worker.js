@@ -4,10 +4,13 @@ const RSMQWorker = require( "rsmq-worker" );
 const workerMatch = new RSMQWorker( 'matches' );
 const workerDriver = new RSMQWorker( "drivers" );
 var redis = require('redis');
-var client = redis.createClient('18.144.40.171');
+var client = redis.createClient('18.144.40.171', 6379);
 
 client.on('error', (err) => {
   console.log('Redis not running', err);
+});
+client.on('connect', ()=> {
+  console.log('afas');
 });
 
 
