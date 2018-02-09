@@ -4,7 +4,7 @@ const RSMQWorker = require( "rsmq-worker" );
 const workerMatch = new RSMQWorker( 'matches' );
 const workerDriver = new RSMQWorker( "drivers" );
 var redis = require('redis');
-var client = redis.createClient('18.144.40.171', '6379');
+var client = redis.createClient('18.144.40.171');
 
 
 workerDriver.on( "message", function( msg, next, id ) {
