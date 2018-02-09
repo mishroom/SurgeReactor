@@ -1,29 +1,29 @@
 const nr = require('newrelic');
 const express = require('express');
 const bodyParser = require('body-parser');
-// const handler = require('./handler.js');
+const handler = require('./handler.js');
 
 const app = express();
 
 app.use(bodyParser.json());
 
-// app.post('/price', handler.getEstimate);
+app.post('/price', handler.getEstimate);
 
-// app.post('/match/:qname', handler.addToQueue);
+app.post('/match/:qname', handler.addToQueue);
 
-// app.get('/delete/:qname', handler.deleteQueue);
+app.get('/delete/:qname', handler.deleteQueue);
 
-// app.get('/add/:qname', handler.addQueue);
+app.get('/add/:qname', handler.addQueue);
 
 app.get('/', (req, res) => { res.send('HEY!'); });
 
 app.get('/test', (req, res) => { res.send('TEST'); });
 
-// app.post('/generatedata', handler.generateData);
+app.post('/generatedata', handler.generateData);
 
-// app.get('/generateQueue/:quantity', handler.generateQueue);
+app.get('/generateQueue/:quantity', handler.generateQueue);
 
-// app.post('/surge', handler.addSurgeData);
+app.post('/surge', handler.addSurgeData);
 
 
 app.listen(3000, () => {

@@ -1,7 +1,7 @@
 const RedisSMQ = require('rsmq');
 const rsmq = new RedisSMQ( {host: '18.144.40.171', port: 6379, ns: 'rsmq'} );
-const worker = require('./worker.js');
-const db = require('./db.js');
+// const worker = require('./worker.js');
+// const db = require('./db.js');
 
 
 module.exports = {
