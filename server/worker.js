@@ -1,5 +1,5 @@
 const RedisSMQ = require("rsmq");
-const rsmq = new RedisSMQ( {host: "127.0.0.1", port: 6379, ns: "rsmq"} );
+const rsmq = new RedisSMQ( {host: '18.144.40.171', port: 6379, ns: "rsmq"} );
 const RSMQWorker = require( "rsmq-worker" );
 const workerMatch = new RSMQWorker( 'matches' );
 const workerDriver = new RSMQWorker( "drivers" );
