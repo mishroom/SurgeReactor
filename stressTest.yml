@@ -2,7 +2,7 @@ config:
   target:  "http://localhost:3000"
   phases:
     - duration: 5
-      arrivalRate: 1000  
+      arrivalRate: 50  
   http:
     timeout: 60
 
@@ -12,6 +12,22 @@ scenarios:
         url: "/match/riders"   
         json: 
           rider: {
+            "id": 45423,
+            "username": "mishfish",
+            "start": {
+              "longitude" : 234, 
+              "latitude": 1343
+            },
+            "destination": {
+              "longitude": 1234,
+              "latitude": 1344
+            },
+            "Timestamp": 13314
+          }
+    - post:
+        url: "/match/drivers"   
+        json: 
+          driver: {
             "id": 45423,
             "username": "mishfish",
             "start": {
