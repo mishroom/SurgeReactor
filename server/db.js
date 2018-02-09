@@ -6,7 +6,8 @@ const db = mongoose.connection;
 const schedule = require('node-schedule');
 
 var redis = require('redis');
-var client = redis.createClient('18.144.40.171');
+var client = redis.createClient('6379','18.144.40.171');
+// var client = redis.createClient('18.144.40.171');
 
 client.on('connect', () => {
   console.log('redis connected successfully');
