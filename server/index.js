@@ -17,6 +17,8 @@ app.use(bodyParser.json());
 
 app.get('/', (req, res) => { res.send('HEY!'); });
 
+app.get('/test', (req, res) => { res.send('TEST'); });
+
 // app.post('/generatedata', handler.generateData);
 
 // app.get('/generateQueue/:quantity', handler.generateQueue);
