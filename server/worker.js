@@ -6,12 +6,12 @@ const workerDriver = new RSMQWorker( "drivers" );
 var redis = require('redis');
 var client = redis.createClient('6379','18.144.40.171');
 
-client.on('error', (err) => {
-  console.log('Redis not running', err);
-});
-client.on('connect', ()=> {
-  console.log('afas');
-});
+// client.on('error', (err) => {
+//   console.log('Redis not running', err);
+// });
+// client.on('connect', ()=> {
+//   console.log('afas');
+// });
 
 
 workerDriver.on( "message", function( msg, next, id ) {
