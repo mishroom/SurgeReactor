@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://54.183.229.105:21017/surge')
+mongoose.connect('mongodb://172.31.9.29/surge')
   .then(()=> {})
   .catch ( (err)=> {
     console.log('MONGO Error', err);
