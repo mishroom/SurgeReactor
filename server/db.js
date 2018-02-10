@@ -72,7 +72,7 @@ const determineSurge = (demand, supply) => {
 };
 
 const getAverage = (data) => {
-
+  console.log('IN getAverage', data);
   // average out the  rider and driver counts counts
   if (data.length) {
     let riderDemandSum = 0;
@@ -123,7 +123,7 @@ const zero = schedule.scheduleJob('00 * * * *', collectData);
 const fifteen = schedule.scheduleJob('15 * * * *', collectData);
 const thirty = schedule.scheduleJob('30 * * * *', collectData);
 const fortyfive = schedule.scheduleJob('45 * * * *', collectData);
-// const now = schedule.scheduleJob('37 * * * *', collectData);
+const now = schedule.scheduleJob('04 * * * *', collectData);
 
 module.exports = {
   generateData: () => {
