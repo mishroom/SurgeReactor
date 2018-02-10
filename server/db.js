@@ -62,6 +62,7 @@ const convertTimeToNearest15Minutes = (time, minutes) => {
 };
 
 const determineSurge = (demand, supply) => {
+  console.log('IN determineSurge');
   let ratio = demand / supply;
 
   client.set('surgeRatio', ratio, (err, resp) => {
