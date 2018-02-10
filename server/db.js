@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://54.183.229.105:21017/surge');
+mongoose.connect('mongodb://54.183.229.105:21017/surge')
+  .then(()=> {})
+  .catch ( (err)=> {
+    console.log('MONGO Error', err);
+
+  });
 const db = mongoose.connection;
 
 const schedule = require('node-schedule');
