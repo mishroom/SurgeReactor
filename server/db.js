@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/surge');
+mongoose.connect('mongodb://54.183.229.105/surge');
 const db = mongoose.connection;
 
 const schedule = require('node-schedule');
