@@ -185,7 +185,7 @@ module.exports = {
         minute: time.getMinutes(),
         seconds: time.getSeconds(),
         rider: getRandomInt(0, 3000),
-        driver: getRandomInt(0, 3000),
+        driver: getRandomInt(0, 2000),
       });
     };
 

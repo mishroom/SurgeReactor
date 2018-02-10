@@ -72,6 +72,7 @@ module.exports = {
     rsmq.createQueue({qname: qname}, (err, resp) => {
       if (err) {
         console.log(err);
+        res.end();
       } else {
         console.log(qname, ' created');
         res.end();
