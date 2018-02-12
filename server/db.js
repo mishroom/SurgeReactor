@@ -62,7 +62,7 @@ const convertTimeToNearest15Minutes = (time, minutes) => {
 };
 
 const determineSurge = (demand, supply) => {
-  console.log('IN determineSurge');
+  // console.log('IN determineSurge');
   let ratio = demand / supply;
 
   client.set('surgeRatio', ratio, (err, resp) => {
@@ -72,7 +72,7 @@ const determineSurge = (demand, supply) => {
 };
 
 const getAverage = (data) => {
-  console.log('IN getAverage', data);
+  // console.log('IN getAverage', data);
   // average out the  rider and driver counts counts
   if (data.length) {
     let riderDemandSum = 0;

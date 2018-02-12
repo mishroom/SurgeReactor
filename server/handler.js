@@ -68,7 +68,9 @@ module.exports = {
 
   addQueue: (req, res) => {
     const {qname} = req.params;
-
+    if (!rsmq) {
+      res.send('NO RSMQ');
+    }
     rsmq.createQueue({qname: qname}, (err, resp) => {
       if (err) {
         console.log(err);
