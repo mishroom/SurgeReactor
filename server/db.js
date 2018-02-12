@@ -11,7 +11,7 @@ const db = mongoose.connection;
 const schedule = require('node-schedule');
 
 var redis = require('redis');
-var client = redis.createClient('6379','52.53.184.79');
+var client = redis.createClient('6379','54.67.52.72');
 // var client = redis.createClient('18.144.40.171');
 
 client.on('connect', () => {
