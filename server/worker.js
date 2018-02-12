@@ -1,10 +1,10 @@
 const RedisSMQ = require("rsmq");
-const rsmq = new RedisSMQ( {host: '54.67.52.72', port: 6379, ns: "rsmq"} );
+const rsmq = new RedisSMQ( {host: '172.31.12.42', port: 6379, ns: "rsmq"} );
 const RSMQWorker = require( "rsmq-worker" );
 const workerMatch = new RSMQWorker( 'matches' );
 const workerDriver = new RSMQWorker( "drivers" );
 var redis = require('redis');
-var client = redis.createClient('6379','54.67.52.72');
+var client = redis.createClient('6379','172.31.12.42');
 
 // client.on('error', (err) => {
 //   console.log('Redis not running', err);
