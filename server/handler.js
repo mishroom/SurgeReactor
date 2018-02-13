@@ -21,7 +21,7 @@ module.exports = {
           res.send(err);
           res.end();
         } else if (resp) {
-          // console.log('Message sent to : ', qname, ' ', resp);
+          console.log('Message sent to : ', qname, ' ', resp);
           res.send('You have been added to the matching pool');
           res.end();
         }
