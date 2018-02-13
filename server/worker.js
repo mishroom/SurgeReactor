@@ -15,6 +15,7 @@ var client = redis.createClient('6379','172.31.12.42');
 
 
 workerDriver.on( "message", function( msg, next, id ) {
+  console.log('in workerDriver');
   let match = {};
   rsmq.getQueueAttributes({qname: 'riders'}, (err, resp) => {
     if (err) {
